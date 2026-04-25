@@ -51,12 +51,13 @@ def write_file(path: str, content: str) -> str:
         return f"Error writing file: {e}"
 
 
-def run_shell(command: str, timeout: int = 30) -> str:
+def run_shell(command: str, timeout: int = 60) -> str:
     """Execute a shell command and return its output.
 
     Args:
         command: The shell command to run.
         timeout: Maximum seconds to wait before killing the process.
+                 Increased default to 60s since 30s was too short for some builds.
 
     Returns:
         Combined stdout and stderr output, or an error message.
@@ -99,34 +100,4 @@ def list_directory(path: str = ".") -> str:
         lines = []
         for entry in sorted(entries):
             full = os.path.join(path, entry)
-            tag = "[dir] " if os.path.isdir(full) else "[file]"
-            lines.append(f"{tag} {entry}")
-        return "\n".join(lines)
-    except FileNotFoundError:
-        return f"Error: Directory not found at '{path}'"
-    except PermissionError:
-        return f"Error: Permission denied listing '{path}'"
-    except Exception as e:
-        return f"Error listing directory: {e}"
-
-
-# Registry mapping tool names to their callables.
-# Extend this dict to register additional tools.
-TOOL_REGISTRY: dict[str, Any] = {
-    "read_file": read_file,
-    "write_file": write_file,
-    "run_shell": run_shell,
-    "list_directory": list_directory,
-}
-
-
-def get_tool(name: str):
-    """Retrieve a tool callable by name.
-
-    Args:
-        name: The registered tool name.
-
-    Returns:
-        The callable, or None if not found.
-    """
-    return TOOL_REGISTRY.get(name)
+            tag = "[dir]"
