@@ -98,6 +98,16 @@ def list_directory(path: str = ".") -> str:
         if not entries:
             return f"Directory '{path}' is empty."
         lines = []
-        for entry in sorted(entries):
-            full = os.path.join(path, entry)
-            tag = "[dir]"
+        for entry in sorted(entries):  # sort for consistent, readable output
+            full_path = os.path.join(path, entry)
+            if os.path.isdir(full_path):
+                lines.append(f"[dir]  {entry}")
+            else:
+                lines.append(f"[file] {entry}")
+        return "\n".join(lines)
+    except FileNotFoundError:
+        return f"Error: Directory not found at path '{path}'"
+    except PermissionError:
+        return f"Error: Permission denied listing '{path}'"
+    except Exception as e:
+        return f"Error listing directory: {e}"
